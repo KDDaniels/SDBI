@@ -1,2 +1,8 @@
-.venv
-./pycache
+*.class
+/.classpath
+/.project
+/.settings/
+*.log
+*.jar
+*.war
+*.ear
