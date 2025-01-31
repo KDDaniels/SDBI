@@ -16,3 +16,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from PyQt5.QtWidgets import QMainWindow
+from gui.menu_bar import MenuBar
+
+class MainWindow(QMainWindow):
+    def __init__(self, title, version):
+        super().__init__()
+        self.setWindowTitle(f'{title} v{version}')
+
+        self.generate_menu()
+        self.generate_gui()
+
+        self.menu.menu_action.connect(self.handle_menu)
+
+    def generate_menu(self):
+        self.menu = MenuBar()
+        self.setMenuBar(self.menu)
+
+    def generate_gui(self):
+        pass
+
+    def handle_menu(self, action):
+        print(action)

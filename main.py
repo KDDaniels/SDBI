@@ -18,8 +18,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import sys
+from PyQt5.QtWidgets import QApplication
+from gui.main_window import MainWindow
+
+title = "EComDB"
+version = "0.0.1"
+
 def main():
-    pass
+    app = QApplication(sys.argv)
+    win = MainWindow(title, version)
+    win.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
