@@ -37,4 +37,61 @@ class MainWindow(QMainWindow):
         pass
 
     def handle_menu(self, action):
-        print(action)
+        print("Action: " + action)
+        match action:
+            # File
+            case "new":
+                # check if unsaved, then create new db
+                pass
+            case "open":
+                # check if unsaved, then open file dialog
+                pass
+            case "save":
+                # save db
+                pass
+            case "save as":
+                # save db as {filename}
+                pass
+            case "close":
+                # close db
+                pass
+            case "exit":
+                # check if unsaved, then exit program
+                self.close()
+            # end
+
+            # Edit
+            case "undo":
+                # undo last action
+                pass
+            case "redo":
+                # redo last action
+                pass
+            case "cut":
+                # cut selected content
+                pass
+            case "copy":
+                # copy content from clipboard
+                pass
+            case "paste":
+                # paste content from clipboard
+                pass
+            case "delete":
+                # delete selected content
+                pass
+            # end
+
+            # Settings
+
+            # end
+
+            # Help
+            case "help":
+                # show help window
+                pass
+            case "about":
+                # show about window
+                pass
+            # end
+
+
