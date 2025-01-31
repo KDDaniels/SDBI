@@ -25,7 +25,6 @@ class MenuBar(QMenuBar):
     def __init__(self):
         super().__init__()
 
-        
         self.generate_buttons()
         self.generate_actions()
 
@@ -35,8 +34,9 @@ class MenuBar(QMenuBar):
         self.generate_settings_menu()
         self.generate_help_menu()
 
-
-
+    """
+    Generates the compoennts of the file menu
+    """
     def generate_file_menu(self):
         self.file_menu = self.addMenu("File")
 
@@ -74,6 +74,9 @@ class MenuBar(QMenuBar):
 
         self.file_menu.addAction(exit_action)
 
+    """
+    Generates the components of the edit menu
+    """
     def generate_edit_menu(self):
         self.edit_menu = self.addMenu("Edit")
         
@@ -105,10 +108,15 @@ class MenuBar(QMenuBar):
         self.edit_menu.addAction(paste_action)
         self.edit_menu.addAction(del_action)
 
+    """
+    Generates the components of the settings menu
+    """
     def generate_settings_menu(self):
         self.settings_menu = self.addMenu("Settings")
 
-        
+    """
+    Generates the components of the help menu
+    """
     def generate_help_menu(self):
         self.help_menu = self.addMenu("Help")
 
@@ -123,9 +131,3 @@ class MenuBar(QMenuBar):
         self.help_menu.addSeparator()
 
         self.help_menu.addAction(about_action)
-        
-
-
-
-    def generate_actions(self):
-        pass
