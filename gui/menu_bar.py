@@ -26,7 +26,6 @@ class MenuBar(QMenuBar):
         super().__init__()
 
         self.generate_buttons()
-        self.generate_actions()
 
     def generate_buttons(self):
         self.generate_file_menu()

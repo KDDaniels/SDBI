@@ -16,25 +16,106 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar
 from gui.menu_bar import MenuBar
 
 class MainWindow(QMainWindow):
+
+
     def __init__(self, title, version):
         super().__init__()
         self.setWindowTitle(f'{title} v{version}')
+        height = 1200
+        width = 800
+        self.setGeometry(100, 100, height, width)
 
         self.generate_menu()
+        self.generate_statusbar()
         self.generate_gui()
 
         self.menu.menu_action.connect(self.handle_menu)
+
+        self.showMaximized()
+
 
     def generate_menu(self):
         self.menu = MenuBar()
         self.setMenuBar(self.menu)
 
+    def generate_statusbar(self):
+        self.status_bar = QStatusBar(self)
+        self.setStatusBar(self.status_bar)
+
+
     def generate_gui(self):
-        pass
+        self.main_window_widget = QWidget(self)
+        self.main_window_widget_layout = QGridLayout(self.main_window_widget)
+
+        self.main_window_widget_layout.addWidget(self.generate_search_widget(), 0, 0, 1, 1)
+
+        self.main_window_widget_layout.addWidget(self.generate_input_widget(), 1, 0, 2, 1)
+
+        self.main_window_widget_layout.addWidget(self.generate_table_widget(), 0, 1, 3, 1)
+
+
+        self.setCentralWidget(self.main_window_widget)
+
+
+    def generate_search_widget(self):
+        self.search_frame = QFrame(self.main_window_widget)
+
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sp.setHorizontalStretch(2)
+        sp.setVerticalStretch(1)
+        sp.setHeightForWidth(self.search_frame.sizePolicy().hasHeightForWidth())
+        self.search_frame.setSizePolicy(sp)
+
+        self.search_frame.setFrameShape(QFrame.StyledPanel)
+        self.search_frame.setFrameShadow(QFrame.Sunken)
+
+        self.search_layout = QHBoxLayout(self.search_frame)
+
+        self.search_input = QLineEdit(self.search_frame)
+        self.search_button = QPushButton("Search", self.search_frame)
+
+        self.search_input.setPlaceholderText("Search...")
+
+        self.search_layout.addWidget(self.search_input)
+        self.search_layout.addWidget(self.search_button)
+
+        return self.search_frame
+    
+
+    def generate_input_widget(self):
+        self.input_frame = QFrame(self.main_window_widget)
+        
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sp.setHorizontalStretch(2)
+        sp.setVerticalStretch(9)
+        sp.setHeightForWidth(self.input_frame.sizePolicy().hasHeightForWidth())
+        self.input_frame.setSizePolicy(sp)
+
+        self.input_frame.setFrameShape(QFrame.StyledPanel)
+        self.input_frame.setFrameShadow(QFrame.Sunken)
+
+        return self.input_frame
+    
+    def generate_table_widget(self):
+        self.table_widget = QTableWidget(self.main_window_widget)
+        
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sp.setHorizontalStretch(8)
+        sp.setVerticalStretch(0)
+        sp.setHeightForWidth(self.table_widget.sizePolicy().hasHeightForWidth())
+        self.table_widget.setSizePolicy(sp)
+
+        self.table_widget.setFrameShape(QFrame.StyledPanel)
+        self.table_widget.setFrameShadow(QFrame.Sunken)
+
+        return self.table_widget
+
+        
+
 
     def handle_menu(self, action):
         print("Action: " + action)
