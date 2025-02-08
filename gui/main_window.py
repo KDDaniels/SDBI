@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget
 from gui.menu_bar import MenuBar
+from gui.help_window import HelpWindow
 
 class MainWindow(QMainWindow):
 
@@ -35,6 +36,8 @@ class MainWindow(QMainWindow):
         self.generate_gui()
 
         self.menu.menu_action.connect(self.handle_menu)
+
+        self.help_window = HelpWindow()
 
         self.showMaximized()
 
@@ -213,11 +216,14 @@ class MainWindow(QMainWindow):
 
             # Help
             case "help":
-                # show help window
-                pass
+                self.help_window.show()
             case "about":
                 # show about window
                 pass
             # end
+
+
+    def create_help_window(self):
+        print("a")
 
 
