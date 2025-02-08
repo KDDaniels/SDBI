@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Little user interface for a small sqlite3 database holding whatever data
 Copyright (C) 2025 Kendall Daniels
@@ -18,18 +16,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import sys
-from PyQt5.QtWidgets import QApplication
-from gui.main_window import MainWindow
+class DatabaseInterface():
+    def __init__(self):
+        self.is_connected = False
+        self.db_name = ""
+        pass
 
-title = "DBConn"
-version = "0.0.1"
+    def connect(self, db_path):
+        # if db_path exists, connect and save name as self.db_name
+        print(db_path)
 
-def main():
-    app = QApplication(sys.argv)
-    win = MainWindow(title, version)
-    win.show()
-    sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
+    def disconnect(self):
+        if self.is_connected:
+            # disconnect
+            pass

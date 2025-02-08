@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget
 from gui.menu_bar import MenuBar
 
 class MainWindow(QMainWindow):
@@ -25,9 +25,10 @@ class MainWindow(QMainWindow):
     def __init__(self, title, version):
         super().__init__()
         self.setWindowTitle(f'{title} v{version}')
-        height = 1200
+        height = 600
         width = 800
-        self.setGeometry(100, 100, height, width)
+        self.setGeometry(100, 100, width, height)
+        self.setMinimumSize(width, height)
 
         self.generate_menu()
         self.generate_statusbar()
@@ -98,8 +99,49 @@ class MainWindow(QMainWindow):
         self.input_frame.setFrameShape(QFrame.StyledPanel)
         self.input_frame.setFrameShadow(QFrame.Sunken)
 
+        self.input_frame_layout = QVBoxLayout(self.input_frame)
+        self.input_widget = QWidget(self.input_frame)
+        
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sp.setHorizontalStretch(0)
+        sp.setVerticalStretch(10)
+        sp.setHeightForWidth(self.input_widget.sizePolicy().hasHeightForWidth())
+        self.input_widget.setSizePolicy(sp);
+
+        self.input_frame_layout.addWidget(self.input_widget);
+
+
+        self.add_entries_button = QPushButton("Add", self.input_frame)
+        self.input_frame_layout.addWidget(self.add_entries_button)
+
+
+        self.line = QFrame(self.input_frame)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.input_frame_layout.addWidget(self.line)
+
+
+        self.tables_list_label = QLabel("Tables", self.input_frame)
+
+        self.input_frame_layout.addWidget(self.tables_list_label)
+
+
+        self.tables_list_widget = QListWidget(self.input_frame)
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sp.setHorizontalStretch(0)
+        sp.setVerticalStretch(0)
+        sp.setHeightForWidth(self.input_frame.sizePolicy().hasHeightForWidth())
+
+        self.tables_list_widget.setSizePolicy(sp)
+
+
+        self.input_frame_layout.addWidget(self.tables_list_widget)
+
+
         return self.input_frame
     
+
     def generate_table_widget(self):
         self.table_widget = QTableWidget(self.main_window_widget)
         
@@ -108,6 +150,9 @@ class MainWindow(QMainWindow):
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(self.table_widget.sizePolicy().hasHeightForWidth())
         self.table_widget.setSizePolicy(sp)
+
+        self.table_widget.setColumnCount(7);
+        self.table_widget.setRowCount(20);
 
         self.table_widget.setFrameShape(QFrame.StyledPanel)
         self.table_widget.setFrameShadow(QFrame.Sunken)
