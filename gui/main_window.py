@@ -16,16 +16,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget, QTableWidgetItem
 from gui.menu_bar import MenuBar
 from gui.help_window import HelpWindow
+from db.database_interface import DatabaseInterface
 
 class MainWindow(QMainWindow):
 
 
     def __init__(self, title, version):
         super().__init__()
-        self.setWindowTitle(f'{title} v{version}')
+        self.title = f'{title} v{version}'
+        self.setWindowTitle(self.title)
         height = 600
         width = 800
         self.setGeometry(100, 100, width, height)
@@ -39,8 +41,63 @@ class MainWindow(QMainWindow):
 
         self.help_window = HelpWindow()
 
-        self.showMaximized()
+        # self.showMaximized()
 
+        self.db = DatabaseInterface(self)
+        # self.table_widget.modificationChanged.connect(self.setWindowModified)
+
+    def has_been_modified(self):
+        return self.isWindowModified()
+    
+    def set_title(self, file_name):
+        self.setWindowTitle(f'{file_name} - {self.title} [*]')
+
+    def load_tables(self, data):
+
+        if self.tables_list_widget.count() > 0:
+            self.tables_list_widget.clear()
+
+        for x in range(len(data)):
+            for i in range(len(data[x])):
+                table_name = data[x][i]
+                self.tables_list_widget.addItem(table_name)
+
+        self.tables_list_widget.itemDoubleClicked.connect(self.load_data)
+
+        self.status_bar.showMessage(f"Loaded {table_name}", 5000)
+
+
+    def load_data(self, table):
+        table_data = self.db.load_table(table.text())
+        # load the data into the grid
+        try:
+            if table_data:
+                self.table_widget.setColumnCount(len(table_data[0]))
+                self.table_widget.setRowCount(len(table_data))
+
+                col_text = []
+                table_fields = self.db.get_fields(table.text())
+                for field in table_fields:
+                    col_text.append(field[1])
+
+                self.table_widget.setHorizontalHeaderLabels(col_text)
+
+                table_data = self.db.get_table_data(table.text())
+                
+                for x in range(len(table_data)):
+                    for i in range(len(table_data[x])):
+                        self.table_widget.setItem(x, i, QTableWidgetItem(str(table_data[x][i])))
+
+
+
+                self.status_bar.showMessage(f"Loaded table: {table.text()}", 5000)
+            else:
+                raise Exception("Table has no values to load")
+                
+        except Exception as e:
+            print(e)
+            self.status_bar.showMessage(f"Error loading table: {table.text()} ({e})", 5000)
+            
 
     def generate_menu(self):
         self.menu = MenuBar()
@@ -154,9 +211,6 @@ class MainWindow(QMainWindow):
         sp.setHeightForWidth(self.table_widget.sizePolicy().hasHeightForWidth())
         self.table_widget.setSizePolicy(sp)
 
-        self.table_widget.setColumnCount(7);
-        self.table_widget.setRowCount(20);
-
         self.table_widget.setFrameShape(QFrame.StyledPanel)
         self.table_widget.setFrameShadow(QFrame.Sunken)
 
@@ -174,6 +228,7 @@ class MainWindow(QMainWindow):
                 pass
             case "open":
                 # check if unsaved, then open file dialog
+                self.db.open()
                 pass
             case "save":
                 # save db
@@ -221,9 +276,4 @@ class MainWindow(QMainWindow):
                 # show about window
                 pass
             # end
-
-
-    def create_help_window(self):
-        print("a")
-
 
