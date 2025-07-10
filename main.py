@@ -7,7 +7,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from gui.main_window import MainWindow
 
-title = "Database Interface"
+title = "SDBI - Simple Database Interface"
 version = "0.0.1"
 
 def main():
