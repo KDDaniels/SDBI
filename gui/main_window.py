@@ -1,40 +1,21 @@
-"""
-Little user interface for a small sqlite3 database holding whatever data
-Copyright (C) 2025 Kendall Daniels
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget, QTableWidgetItem
-from gui.menu_bar import MenuBar
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton, QLabel, QStatusBar, QListWidget, QTableWidgetItem, QDesktopWidget
+from gui.components.menu_bar import MenuBar
+from gui.components.input_widget import InputFrame
 from gui.help_window import HelpWindow
 from db.database_interface import DatabaseInterface
 
 class MainWindow(QMainWindow):
-
-
     def __init__(self, title, version):
         super().__init__()
         self.title = f'{title} v{version}'
         self.setWindowTitle(self.title)
         height = 600
-        width = 800
+        width  = 800
         self.setGeometry(100, 100, width, height)
         self.setMinimumSize(width, height)
 
-        self.generate_menu()
-        self.generate_statusbar()
+        self.center_window()
+
         self.generate_gui()
 
         self.menu.menu_action.connect(self.handle_menu)
@@ -44,13 +25,24 @@ class MainWindow(QMainWindow):
         # self.showMaximized()
 
         self.db = DatabaseInterface(self)
-        # self.table_widget.modificationChanged.connect(self.setWindowModified)
 
-    def has_been_modified(self):
-        return self.isWindowModified()
+
+    def center_window(self):
+        frame = self.frameGeometry()
+
+        screen_center = QDesktopWidget().availableGeometry().center()
+
+        frame.moveCenter(screen_center)
+
+        self.move(frame.topLeft())
+
     
-    def set_title(self, file_name):
-        self.setWindowTitle(f'{file_name} - {self.title} [*]')
+    def set_title(self, file_name=None):
+        if file_name is not None:
+            self.setWindowTitle(f'{file_name} - {self.title} [*]')
+        else:
+            self.setWindowTitle(f'{self.title}')
+
 
     def load_tables(self, data):
 
@@ -63,8 +55,16 @@ class MainWindow(QMainWindow):
                 self.tables_list_widget.addItem(table_name)
 
         self.tables_list_widget.itemDoubleClicked.connect(self.load_data)
+        # self.tables_list_widget.setContextMenuPolicy()
 
         self.status_bar.showMessage(f"Loaded {table_name}", 5000)
+
+
+    def right_click_menu(self, type):
+        match type:
+            case "table":
+                print("table")
+        ...
 
 
     def load_data(self, table):
@@ -89,7 +89,6 @@ class MainWindow(QMainWindow):
                         self.table_widget.setItem(x, i, QTableWidgetItem(str(table_data[x][i])))
 
 
-
                 self.status_bar.showMessage(f"Loaded table: {table.text()}", 5000)
             else:
                 raise Exception("Table has no values to load")
@@ -97,24 +96,34 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
             self.status_bar.showMessage(f"Error loading table: {table.text()} ({e})", 5000)
-            
 
-    def generate_menu(self):
-        self.menu = MenuBar()
-        self.setMenuBar(self.menu)
 
-    def generate_statusbar(self):
-        self.status_bar = QStatusBar(self)
-        self.setStatusBar(self.status_bar)
+    def get_table_data(self):
+        for x in range(self.table_widget.rowCount()):
+            data = []
+            for i in range(self.table_widget.columnCount()):
+                data.append(self.table_widget.item(x, i).text())
+
+            data = tuple(data)
+
+            self.db.save_data(data)
 
 
     def generate_gui(self):
         self.main_window_widget = QWidget(self)
         self.main_window_widget_layout = QGridLayout(self.main_window_widget)
+        
+        self.menu = MenuBar()
+        self.setMenuBar(self.menu)
 
-        self.main_window_widget_layout.addWidget(self.generate_search_widget(), 0, 0, 1, 1)
+        self.status_bar = QStatusBar(self)
+        self.setStatusBar(self.status_bar)
 
-        self.main_window_widget_layout.addWidget(self.generate_input_widget(), 1, 0, 2, 1)
+        self.input_frame = InputFrame(self)
+
+        # self.main_window_widget_layout.addWidget(self.generate_search_widget(), 0, 0, 1, 1)
+
+        self.main_window_widget_layout.addWidget(self.input_frame, 1, 0, 2, 1)
 
         self.main_window_widget_layout.addWidget(self.generate_table_widget(), 0, 1, 3, 1)
 
@@ -147,61 +156,6 @@ class MainWindow(QMainWindow):
         return self.search_frame
     
 
-    def generate_input_widget(self):
-        self.input_frame = QFrame(self.main_window_widget)
-        
-        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sp.setHorizontalStretch(2)
-        sp.setVerticalStretch(9)
-        sp.setHeightForWidth(self.input_frame.sizePolicy().hasHeightForWidth())
-        self.input_frame.setSizePolicy(sp)
-
-        self.input_frame.setFrameShape(QFrame.StyledPanel)
-        self.input_frame.setFrameShadow(QFrame.Sunken)
-
-        self.input_frame_layout = QVBoxLayout(self.input_frame)
-        self.input_widget = QWidget(self.input_frame)
-        
-        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(10)
-        sp.setHeightForWidth(self.input_widget.sizePolicy().hasHeightForWidth())
-        self.input_widget.setSizePolicy(sp);
-
-        self.input_frame_layout.addWidget(self.input_widget);
-
-
-        self.add_entries_button = QPushButton("Add", self.input_frame)
-        self.input_frame_layout.addWidget(self.add_entries_button)
-
-
-        self.line = QFrame(self.input_frame)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.input_frame_layout.addWidget(self.line)
-
-
-        self.tables_list_label = QLabel("Tables", self.input_frame)
-
-        self.input_frame_layout.addWidget(self.tables_list_label)
-
-
-        self.tables_list_widget = QListWidget(self.input_frame)
-        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.input_frame.sizePolicy().hasHeightForWidth())
-
-        self.tables_list_widget.setSizePolicy(sp)
-
-
-        self.input_frame_layout.addWidget(self.tables_list_widget)
-
-
-        return self.input_frame
-    
-
     def generate_table_widget(self):
         self.table_widget = QTableWidget(self.main_window_widget)
         
@@ -216,8 +170,6 @@ class MainWindow(QMainWindow):
 
         return self.table_widget
 
-        
-
 
     def handle_menu(self, action):
         print("Action: " + action)
@@ -225,20 +177,25 @@ class MainWindow(QMainWindow):
             # File
             case "new":
                 # check if unsaved, then create new db
-                pass
+                self.get_table_data()
+                ...
+            case "new table":
+                # open window w/ options to create a new table with
+                ...
             case "open":
                 # check if unsaved, then open file dialog
                 self.db.open()
-                pass
+                ...
             case "save":
                 # save db
-                pass
+                ...
             case "save as":
+                self.db.save_as()
                 # save db as {filename}
-                pass
+                ...
             case "close":
                 # close db
-                pass
+                ...
             case "exit":
                 # check if unsaved, then exit program
                 self.close()
@@ -247,22 +204,22 @@ class MainWindow(QMainWindow):
             # Edit
             case "undo":
                 # undo last action
-                pass
+                ...
             case "redo":
                 # redo last action
-                pass
+                ...
             case "cut":
                 # cut selected content
-                pass
+                ...
             case "copy":
                 # copy content from clipboard
-                pass
+                ...
             case "paste":
                 # paste content from clipboard
-                pass
+                ...
             case "delete":
                 # delete selected content
-                pass
+                ...
             # end
 
             # Settings
@@ -274,6 +231,9 @@ class MainWindow(QMainWindow):
                 self.help_window.show()
             case "about":
                 # show about window
-                pass
+                ...
             # end
 
+
+    def handle_input(self, action):
+        ...
