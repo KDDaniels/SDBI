@@ -1,21 +1,3 @@
-"""
-Little user interface for a small sqlite3 database holding whatever data
-Copyright (C) 2025 Kendall Daniels
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
-
 from PyQt5.QtWidgets import QMenuBar, QMenu, QAction
 from PyQt5.QtCore import pyqtSignal
 
@@ -39,8 +21,11 @@ class MenuBar(QMenuBar):
     def generate_file_menu(self):
         self.file_menu = self.addMenu("File")
 
-        new_action = QAction("New", self)
+        new_action = QAction("New File", self)
         new_action.triggered.connect(lambda: self.menu_action.emit("new"))
+
+        new_table_action = QAction("New Table", self)
+        new_table_action.triggered.connect(lambda: self.menu_action.emit("new table"))
 
         open_action = QAction("Open", self)
         open_action.triggered.connect(lambda: self.menu_action.emit("open"))
@@ -58,6 +43,7 @@ class MenuBar(QMenuBar):
         exit_action.triggered.connect(lambda: self.menu_action.emit("exit"))
 
         self.file_menu.addAction(new_action)
+        self.file_menu.addAction(new_table_action)
         self.file_menu.addAction(open_action)
 
         self.file_menu.addSeparator()
