@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QTableWidget, QSizePolicy, QHBoxLayout, QLineEdit, QPushButton, QStatusBar, QDesktopWidget
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QStatusBar, QDesktopWidget
 from gui.components.menu_bar import MenuBar
 from gui.components.input_widget import InputFrame
 from gui.components.table_widget import TableWidget
@@ -54,8 +54,6 @@ class MainWindow(QMainWindow):
         self.input_frame = InputFrame(self)
 
         self.table_widget = TableWidget(self, self.db)
-
-        # self.main_window_widget_layout.addWidget(self.generate_search_widget(), 0, 0, 1, 1)
 
         self.main_window_widget_layout.addWidget(self.input_frame, 1, 0, 2, 1)
 

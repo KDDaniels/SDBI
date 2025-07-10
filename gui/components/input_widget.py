@@ -3,8 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 
 class InputFrame(QFrame):
-    input_signal = pyqtSignal(str)
-    status_signal = pyqtSignal(str)
+    signal = pyqtSignal(str)
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -21,9 +20,7 @@ class InputFrame(QFrame):
         btn_horizontal_stretch = 0
         btn_vertical_stretch   = 0
         self.buttons = InputButtons(self)
-        self.set_size_policy(self.buttons, btn_horizontal_stretch, btn_vertical_stretch)
-
-        self.buttons.btn_pressed.connect(self.pass_signal)
+        self.set_size_policy(self.buttons, btn_horizontal_stretch, btn_vertical_stretch)     
 
         self.line = HLine(self)
         self.set_frame_style(self.line, QFrame.HLine, QFrame.Sunken)
@@ -35,13 +32,16 @@ class InputFrame(QFrame):
         self.tables = TableList(self)
         self.set_size_policy(self.tables, tbl_horizontal_stretch, tbl_vertical_stretch)
 
+        self.buttons.signal.connect(self.pass_signal)
+        self.tables.signal.connect(self.pass_signal)
+
         self.layout.addWidget(self.buttons)
         self.layout.addWidget(self.line)
         self.layout.addWidget(self.tables_label)
         self.layout.addWidget(self.tables)
 
     def pass_signal(self, data):
-        self.input_signal.emit(data)
+        self.signal.emit(data)
         print(data)
 
     def update_list(self, data):
@@ -60,7 +60,7 @@ class InputFrame(QFrame):
 
 
 class InputButtons(QWidget):
-    btn_pressed = pyqtSignal(str)
+    signal = pyqtSignal(str)
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -73,9 +73,9 @@ class InputButtons(QWidget):
         self.add_row_btn   = QPushButton("Add Row", self)
         self.add_col_btn   = QPushButton("Add Column", self)
 
-        self.add_table_btn.clicked.connect(lambda: self.btn_pressed.emit("add_table"))
-        self.add_row_btn.clicked.connect(lambda: self.btn_pressed.emit("add_row"))
-        self.add_col_btn.clicked.connect(lambda: self.btn_pressed.emit("add_col"))
+        self.add_table_btn.clicked.connect(lambda: self.signal.emit("btn:add_table"))
+        self.add_row_btn.clicked.connect(lambda: self.signal.emit("btn:add_row"))
+        self.add_col_btn.clicked.connect(lambda: self.signal.emit("btn:add_col"))
 
         self.layout.addWidget(self.add_table_btn)
         self.layout.addWidget(self.add_row_btn)
@@ -88,8 +88,7 @@ class HLine(QFrame):
 
 
 class TableList(QListWidget):
-    list_data = pyqtSignal(str)
-    status_signal = pyqtSignal(str)
+    signal = pyqtSignal(str)
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -103,6 +102,9 @@ class TableList(QListWidget):
                 table_name = data[x][i]
                 self.addItem(table_name)
 
-        self.itemDoubleClicked.connect(self.list_data.emit)
+        self.itemDoubleClicked.connect(self.double_click)
 
-        self.status_signal.emit(f"Loaded: {table_name}")
+        self.signal.emit(f"Loaded: {table_name}")
+
+    def double_click(self, data):
+        self.signal.emit(f"load_table:{data.text()}")

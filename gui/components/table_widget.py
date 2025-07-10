@@ -33,14 +33,14 @@ class TableWidget(QTableWidget):
                         self.setItem(x, i, QTableWidgetItem(str(table_data[x][i])))
 
 
-                self.signal.emit(f"status:Loaded table {table}")
+                self.signal.emit(f"status:Loaded table [{table}]")
                 print("loaded")
             else:
                 raise Exception("Table has no values to load")
             
         except Exception as e:
             print(f"[ERROR] {e}")
-            self.signal.emit(f"status:Error loading table {table} ({e})")
+            self.signal.emit(f"status:Error loading table [{table}] ({e})")
         
     def set_size_policy(self, component, horizontal, vertical):
         sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
